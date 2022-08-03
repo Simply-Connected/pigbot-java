@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Make envfile
+        run: |
+          touch .env.production
+          echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+          cat .env.production
+
+      - name: Build Docker Images
+        run: docker-compose build  --no-cache
+
+      - name: Run containtes
+        run: docker-compose -f docker-compose-prod.yml up -d
