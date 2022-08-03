@@ -8,7 +8,7 @@ services:
     ports:
       - "20000:5432"
     volumes:
-      - data:/var/lib/postgresql/data
+      - pig-bot_data:/var/lib/postgresql/data
   server:
     build:
       context: .
@@ -20,4 +20,5 @@ services:
     networks:
       - default
 volumes:
-  data:
+  pig-bot_data:
+    external: true
