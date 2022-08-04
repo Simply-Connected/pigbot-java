@@ -4,7 +4,6 @@ import com.simplyconnected.pigbot.config.PigConfiguration;
 import com.simplyconnected.pigbot.model.Pig;
 import com.simplyconnected.pigbot.model.User;
 import com.simplyconnected.pigbot.repository.PigRepository;
-import com.simplyconnected.pigbot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class BotService {
 
-    private final UserRepository userRepository;
     private final PigRepository pigRepository;
     private final MessageProvider messageProvider;
     private final PigConfiguration pigConfiguration;
@@ -40,7 +38,7 @@ public class BotService {
                 return messageProvider.alreadyGrown(pig);
             }
         }
-        int diff = random.nextInt(-5, 11);
+        int diff = getDiff();
         if (pig.getWeight() + diff <= 0) {
             pig.setLastGrow(null);
             pig.setWeight(pigConfiguration.getDefaultWeight());
@@ -54,6 +52,19 @@ public class BotService {
         pigRepository.save(pig);
         logger.info("user={}\tpig={}\tdiff={}\ttotal={}", user.getTelegramId(), pig.getName(), diff, pig.getWeight());
         return messageProvider.diff(pig, diff);
+    }
+
+    private int getDiff() {
+        double rollSign = random.nextDouble();
+        double dispatch = pigConfiguration.getProbabilityNegative();
+        if (rollSign < dispatch) {
+            return random.nextInt(-5, 0);
+        }
+        dispatch += pigConfiguration.getProbabilityZero();
+        if (rollSign < dispatch) {
+            return 0;
+        }
+        return random.nextInt(0, 11);
     }
 
     public String rename(UserCredential userCredential, String name) {
