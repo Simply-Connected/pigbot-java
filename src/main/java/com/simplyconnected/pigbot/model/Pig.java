@@ -6,6 +6,8 @@ import org.hibernate.annotations.Type;
 import javax.persistence.*;
 import java.time.OffsetDateTime;
 
+// hru hru
+
 @Entity
 @Table(name = "pigs")
 @Getter
